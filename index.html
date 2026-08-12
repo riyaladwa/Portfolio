@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riya P Ladwa | Computer Science & Engineering Student & Developer</title>
+  <meta name="description" content="Personal portfolio of Riya P Ladwa, a Computer Science & Engineering student building AI-powered web applications and strengthening problem-solving through Java & DSA.">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://riyaladwa.dev/">
+  <meta property="og:title" content="Riya P Ladwa | CSE Student & AI/Web Developer">
+  <meta property="og:description" content="Computer Science Engineering student passionate about building practical, AI-powered applications and solving problems through Java & DSA.">
+  <meta property="og:image" content="/images/riya.jpeg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Riya P Ladwa | CSE Student & AI/Web Developer">
+  <meta property="twitter:description" content="Computer Science Engineering student passionate about building practical, AI-powered applications and solving problems through Java & DSA.">
+  <meta property="twitter:image" content="/images/riya.jpeg">
+
+  <!-- Preload Critical Image -->
+  <link rel="preload" href="/images/riya.jpeg" as="image" fetchpriority="high">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- CSS Entry -->
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  
+  <!-- Sticky Header -->
+  <header id="site-header" class="site-header">
+    <div class="container header-container">
+      <a href="#home" class="logo" id="nav-logo">
+        <span class="logo-text">Riya P Ladwa</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#skills" class="nav-link">Skills</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#hackathons" class="nav-link">Hackathons</a></li>
+          <li><a href="#certifications" class="nav-link">Certifications</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Resume Button -->
+      <div class="header-actions">
+        <a href="/resume.pdf" class="btn btn-outline btn-sm resume-download-btn" target="_blank" rel="noopener noreferrer" download="Riya_P_Ladwa_Resume.pdf">
+          <span>Download Resume</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-right"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </a>
+        <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-controls="mobile-nav-drawer" aria-expanded="false" aria-label="Toggle navigation menu">
+          <svg class="hamburger-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-content">
+      <nav class="mobile-nav" aria-label="Mobile Navigation">
+        <ul class="mobile-nav-list">
+          <li><a href="#home" class="mobile-nav-link">Home</a></li>
+          <li><a href="#about" class="mobile-nav-link">About</a></li>
+          <li><a href="#skills" class="mobile-nav-link">Skills</a></li>
+          <li><a href="#projects" class="mobile-nav-link">Projects</a></li>
+          <li><a href="#hackathons" class="mobile-nav-link">Hackathons</a></li>
+          <li><a href="#certifications" class="mobile-nav-link">Certifications</a></li>
+          <li><a href="#contact" class="mobile-nav-link">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="mobile-drawer-footer">
+        <a href="/resume.pdf" class="btn btn-outline btn-full resume-download-btn" target="_blank" rel="noopener noreferrer" download="Riya_P_Ladwa_Resume.pdf">
+          <span>Download Resume</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-right"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+  </div>
+
+  <main>
+
+    <!-- HERO SECTION -->
+    <section id="home" class="hero-section section-padding scroll-mt">
+      <div class="container hero-grid">
+        <!-- Hero Content -->
+        <div class="hero-content hero-entrance-stagger">
+          <div class="badge-accent scale-up-entry">Welcome to my space</div>
+          <span class="hero-greeting slide-up-entry">Hi, I'm Riya Ladwa</span>
+          <h1 class="hero-headline slide-up-entry">
+            Computer Science Engineering Student building <span class="highlight-accent">AI-powered web applications</span> and strengthening problem-solving through <span class="highlight-accent">Java & DSA</span>.
+          </h1>
+          <p class="hero-description slide-up-entry">
+            I enjoy turning ideas into practical applications, exploring AI technologies, and continuously improving my problem-solving and development skills.
+          </p>
+          <div class="hero-actions slide-up-entry">
+            <a href="#projects" class="btn btn-primary">
+              <span>View Projects</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="/resume.pdf" class="btn btn-secondary resume-download-btn" target="_blank" rel="noopener noreferrer" download="Riya_P_Ladwa_Resume.pdf">
+              <span>Download Resume</span>
+            </a>
+          </div>
+          <div class="hero-socials slide-up-entry">
+            <span class="socials-label">Connect:</span>
+            <a href="https://github.com/riyaladwa" class="social-icon-link" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+            <a href="https://www.linkedin.com/in/riya-ladwa-b25275306" class="social-icon-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Photo Frame -->
+        <div class="hero-photo-wrapper fade-in-scale-entry">
+          <div class="photo-accent-block"></div>
+          <div class="photo-border-box">
+            <img src="/images/riya.jpeg" alt="Riya P Ladwa Portrait" class="hero-photo" fetchpriority="high">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="about-section section-padding bg-alt scroll-mt scroll-reveal">
+      <div class="container">
+        <div class="section-title-wrapper">
+          <span class="section-subtitle">About Me</span>
+          <h2 class="section-title">Background & Drive</h2>
+        </div>
+        
+        <div class="about-grid">
+          <!-- Text Paragraphs -->
+          <div class="about-text-content">
+            <p>
+              I am a Computer Science & Engineering student interested in software development, artificial intelligence, and problem solving.
+            </p>
+            <p>
+              I enjoy turning ideas into practical applications and exploring how AI can be used to solve real-world problems. Through projects and hackathons, I have worked on applications involving AI, cybersecurity, urban intelligence, productivity, APIs, databases, and modern web technologies.
+            </p>
+            <p>
+              Currently, I am strengthening my foundation in Java and Data Structures & Algorithms for placement preparation while continuing to improve my web development and AI development skills.
+            </p>
+            <p>
+              I believe in learning by building — experimenting with new technologies, solving problems, and continuously improving the things I create.
+            </p>
+          </div>
+
+          <!-- Highlight Cards -->
+          <div class="about-highlights">
+            <div class="highlight-sidebar-card">
+              <h3 class="highlight-card-title">Core Focus Areas</h3>
+              <ul class="highlight-list">
+                <li>
+                  <div class="highlight-icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </div>
+                  <div>
+                    <strong>Java & DSA Enthusiast</strong>
+                    <span>Deepening problem-solving skills, complexity analysis, and algorithms.</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="highlight-icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                  </div>
+                  <div>
+                    <strong>AI & Web Integration</strong>
+                    <span>Crafting dynamic UIs and linking them with generative AI models (OpenAI, Gemini).</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="highlight-icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.49-11.05 1-11.6 8.56"/></svg>
+                  </div>
+                  <div>
+                    <strong>Practical Builder</strong>
+                    <span>Applying software patterns under timelines at hackathons to deliver working code.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- Education Timeline -->
+            <div class="education-card">
+              <h3 class="highlight-card-title">Education</h3>
+              <div class="education-item">
+                <div class="education-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
+                </div>
+                <div class="education-info">
+                  <span class="education-school">Bapuji Institute of Engineering and Technology, Davangere</span>
+                  <span class="education-degree">Bachelor of Technology — Computer Science & Engineering</span>
+                  <span class="education-affiliation">Visvesvaraya Technological University (VTU)</span>
+                  <div class="education-gpa-badge">CGPA: 8.8 / 10</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS SECTION -->
+    <section id="skills" class="skills-section section-padding scroll-mt scroll-reveal">
+      <div class="container">
+        <div class="section-title-wrapper">
+          <span class="section-subtitle">Technical Mastery</span>
+          <h2 class="section-title">Skills & Capabilities</h2>
+        </div>
+
+        <div class="skills-grid">
+          <!-- Programming Languages -->
+          <div class="skills-category-card">
+            <h3 class="skills-category-title">Programming Languages</h3>
+            <div class="skills-badges">
+              <span class="skill-badge">Java</span>
+              <span class="skill-badge">Python</span>
+              <span class="skill-badge">C++</span>
+              <span class="skill-badge">JavaScript</span>
+            </div>
+          </div>
+
+          <!-- Web Development -->
+          <div class="skills-category-card">
+            <h3 class="skills-category-title">Web Development</h3>
+            <div class="skills-badges">
+              <span class="skill-badge">HTML5</span>
+              <span class="skill-badge">CSS3</span>
+              <span class="skill-badge">JavaScript ES6+</span>
+              <span class="skill-badge">React.js</span>
+              <span class="skill-badge">REST APIs</span>
+              <span class="skill-badge">Responsive Design</span>
+            </div>
+          </div>
+
+          <!-- Computer Science -->
+          <div class="skills-category-card">
+            <h3 class="skills-category-title">Computer Science</h3>
+            <div class="skills-badges">
+              <span class="skill-badge">Data Structures & Algorithms</span>
+              <span class="skill-badge">OOP</span>
+              <span class="skill-badge">DBMS</span>
+              <span class="skill-badge">Operating Systems</span>
+              <span class="skill-badge">Computer Networks</span>
+              <span class="skill-badge">Algorithm Design</span>
+            </div>
+          </div>
+
+          <!-- AI & APIs -->
+          <div class="skills-category-card">
+            <h3 class="skills-category-title">AI & APIs</h3>
+            <div class="skills-badges">
+              <span class="skill-badge">AI Application Development</span>
+              <span class="skill-badge">OpenAI API</span>
+              <span class="skill-badge">Gemini API</span>
+              <span class="skill-badge">REST API Integration</span>
+            </div>
+          </div>
+
+          <!-- Databases -->
+          <div class="skills-category-card">
+            <h3 class="skills-category-title">Databases</h3>
+            <div class="skills-badges">
+              <span class="skill-badge">MongoDB</span>
+              <span class="skill-badge">Supabase</span>
+              <span class="skill-badge">SQL</span>
+            </div>
+          </div>
+
+          <!-- Tools -->
+          <div class="skills-category-card">
+            <h3 class="skills-category-title">Tools</h3>
+            <div class="skills-badges">
+              <span class="skill-badge">Git</span>
+              <span class="skill-badge">GitHub</span>
+              <span class="skill-badge">VS Code</span>
+              <span class="skill-badge">Vercel</span>
+              <span class="skill-badge">Render</span>
+              <span class="skill-badge">Replit</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURED PROJECTS SECTION -->
+    <section id="projects" class="projects-section section-padding bg-alt scroll-mt scroll-reveal">
+      <div class="container">
+        <div class="section-title-wrapper">
+          <span class="section-subtitle">Portfolio Showpiece</span>
+          <h2 class="section-title">Featured Projects</h2>
+        </div>
+
+        <div class="projects-list">
+          
+          <!-- PROJECT 1: GUARDIAN AI -->
+          <article class="project-showcase-card">
+            <div class="project-card-image-box">
+              <div class="project-mock-visual visual-guardian">
+                <div class="mock-ui-shell">
+                  <div class="mock-ui-bar"><span></span><span></span><span></span></div>
+                  <div class="mock-ui-content">
+                    <div class="mock-metrics-row">
+                      <div class="mock-metric-radial">
+                        <svg viewBox="0 0 36 36" class="circular-chart gold"><path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" /><path class="circle" stroke-dasharray="88, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" /><text x="18" y="20.35" class="percentage">88%</text></svg>
+                        <span>Risk Threat Index</span>
+                      </div>
+                      <div class="mock-logs-box">
+                        <div class="mock-log-line alert"><span>[CRITICAL]</span> Threat Detected</div>
+                        <div class="mock-log-line warning"><span>[WARN]</span> DB Access Blocked</div>
+                        <div class="mock-log-line info"><span>[INFO]</span> AI Scanner Idle</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-card-info">
+              <span class="project-card-category">Security Platform</span>
+              <h3 class="project-card-title">Guardian AI</h3>
+              <h4 class="project-card-subtitle">AI-Powered Multimodal Scam Detection Platform</h4>
+              <p class="project-card-desc">
+                Engineered a full-stack, API-driven cybersecurity platform designed to analyze images, video, voice, email, SMS, URLs, and documents to detect scams in real time.
+              </p>
+              
+              <div class="project-card-features-box">
+                <h5>Key System Features:</h5>
+                <ul class="project-features-list">
+                  <li>Engineers a multimodal scan system for real-time security checking</li>
+                  <li>Designed modular dashboard structure with digital safety metrics</li>
+                  <li>Implemented JWT security handling and custom API orchestration layers</li>
+                  <li>Threat intelligence integration and AI alerts</li>
+                </ul>
+              </div>
+
+              <div class="project-tech-stack">
+                <span class="stack-badge">React.js</span>
+                <span class="stack-badge">Next.js</span>
+                <span class="stack-badge">TypeScript</span>
+                <span class="stack-badge">Tailwind CSS</span>
+                <span class="stack-badge">Node.js</span>
+                <span class="stack-badge">Express.js</span>
+                <span class="stack-badge">Gemini API</span>
+                <span class="stack-badge">OpenAI API</span>
+                <span class="stack-badge">Supabase</span>
+                <span class="stack-badge">MongoDB</span>
+              </div>
+
+              <div class="project-actions">
+                <a href="https://github.com/riyaladwa/guardian-ai.git" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-left"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                  <span>View Repository</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 2: CIVIC TWIN AI -->
+          <article class="project-showcase-card">
+            <div class="project-card-image-box">
+              <div class="project-mock-visual visual-civictwin">
+                <div class="mock-ui-shell">
+                  <div class="mock-ui-bar"><span></span><span></span><span></span></div>
+                  <div class="mock-ui-content">
+                    <div class="mock-map-visual">
+                      <div class="map-grid-pattern"></div>
+                      <div class="map-pulse-node x-30 y-40"></div>
+                      <div class="map-pulse-node x-70 y-60 secondary"></div>
+                      <div class="map-floating-overlay">
+                        <span>Traffic Simulation</span>
+                        <strong>Level: Optimal</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-card-info">
+              <span class="project-card-category">Urban Simulation</span>
+              <h3 class="project-card-title">Civic Twin AI</h3>
+              <h4 class="project-card-subtitle">AI-Powered City Digital Twin</h4>
+              <p class="project-card-desc">
+                Civic Twin AI is an intelligent urban platform that uses digital-twin concepts, AI-powered predictions, simulations, and map-based visualization to help understand and monitor city-level problems.
+              </p>
+
+              <div class="project-card-features-box">
+                <h5>Key System Features:</h5>
+                <ul class="project-features-list">
+                  <li>Digital representation of city systems and mapping data</li>
+                  <li>AI-powered simulations & predictive diagnostics</li>
+                  <li>Google Maps & geospatial visualization</li>
+                  <li>Supabase-powered real-time alert system</li>
+                </ul>
+              </div>
+
+              <div class="project-tech-stack">
+                <span class="stack-badge">React.js</span>
+                <span class="stack-badge">JavaScript</span>
+                <span class="stack-badge">Vite</span>
+                <span class="stack-badge">Supabase</span>
+                <span class="stack-badge">Google Maps</span>
+                <span class="stack-badge">AI APIs</span>
+              </div>
+
+              <div class="project-actions">
+                <a href="https://github.com/riyaladwa/civic-twin-ai.git" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-left"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                  <span>View Repository</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 3: TASK MANAGER PRO -->
+          <article class="project-showcase-card">
+            <div class="project-card-image-box">
+              <div class="project-mock-visual visual-taskpro">
+                <div class="mock-ui-shell">
+                  <div class="mock-ui-bar"><span></span><span></span><span></span></div>
+                  <div class="mock-ui-content">
+                    <div class="mock-board-layout">
+                      <div class="mock-board-column">
+                        <h6>To Do</h6>
+                        <div class="mock-card">Solve 10 DSA</div>
+                        <div class="mock-card">Vite Setup</div>
+                      </div>
+                      <div class="mock-board-column">
+                        <h6>Active</h6>
+                        <div class="mock-card active">Code Style</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-card-info">
+              <span class="project-card-category">Productivity Tool</span>
+              <h3 class="project-card-title">Task Manager Pro</h3>
+              <h4 class="project-card-subtitle">Full-Stack Productivity Application</h4>
+              <p class="project-card-desc">
+                Built a full-stack task manager with complete CRUD operations and real-time UI sync, backed by a Node.js/Express REST API and a persistent MongoDB/Supabase database.
+              </p>
+
+              <div class="project-card-features-box">
+                <h5>Key System Features:</h5>
+                <ul class="project-features-list">
+                  <li>Full CRUD operations and real-time UI synchronization</li>
+                  <li>JWT authentication and middleware-based route protection</li>
+                  <li>Coordinated asynchronous data flow between client and backend</li>
+                  <li>Modular frontend architecture with reusable UI components</li>
+                </ul>
+              </div>
+
+              <div class="project-tech-stack">
+                <span class="stack-badge">React.js</span>
+                <span class="stack-badge">JavaScript</span>
+                <span class="stack-badge">Node.js</span>
+                <span class="stack-badge">Express.js</span>
+                <span class="stack-badge">MongoDB</span>
+                <span class="stack-badge">Supabase</span>
+                <span class="stack-badge">Gemini API</span>
+                <span class="stack-badge">CSS</span>
+              </div>
+
+              <div class="project-actions">
+                <a href="https://github.com/riyaladwa/TaskPro-Manager.git" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-left"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                  <span>View Repository</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- HACKATHONS SECTION -->
+    <section id="hackathons" class="hackathons-section section-padding scroll-mt scroll-reveal">
+      <div class="container">
+        <div class="section-title-wrapper">
+          <span class="section-subtitle">Collaborating & Building</span>
+          <h2 class="section-title">Building Under Pressure</h2>
+        </div>
+
+        <div class="hackathons-layout">
+          <!-- Text Explanation -->
+          <div class="hackathons-text">
+            <p class="lead-text">
+              Hackathons have given me the opportunity to work on real-world problems, experiment with emerging technologies, collaborate with teams, and turn ideas into working prototypes.
+            </p>
+            <p>
+              By translating complex concepts into functional application structures in hours, I learned to coordinate project delivery and make pragmatic software architecture decisions under tight time constraints.
+            </p>
+            
+            <div class="hackathons-prototypes-box">
+              <h5>Prototypes Developed:</h5>
+              <div class="hackathon-project-badges">
+                <span class="hackathon-proj-badge">
+                  <strong>Guardian AI</strong> Cybersecurity Log Scanner
+                </span>
+                <span class="hackathon-proj-badge">
+                  <strong>Civic Twin AI</strong> Intelligent Urban Simulator
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills Gained Grid -->
+          <div class="hackathons-skills">
+            <h3 class="hackathon-skills-title">Competencies Consolidated</h3>
+            <div class="hackathon-skills-grid">
+              <div class="h-skill-card">
+                <span class="h-skill-index">01</span>
+                <strong>Rapid Prototyping</strong>
+              </div>
+              <div class="h-skill-card">
+                <span class="h-skill-index">02</span>
+                <strong>Problem Solving</strong>
+              </div>
+              <div class="h-skill-card">
+                <span class="h-skill-index">03</span>
+                <strong>Team Collaboration</strong>
+              </div>
+              <div class="h-skill-card">
+                <span class="h-skill-index">04</span>
+                <strong>AI Integration</strong>
+              </div>
+              <div class="h-skill-card">
+                <span class="h-skill-index">05</span>
+                <strong>API Integration</strong>
+              </div>
+              <div class="h-skill-card">
+                <span class="h-skill-index">06</span>
+                <strong>Time Management</strong>
+              </div>
+              <div class="h-skill-card">
+                <span class="h-skill-index">07</span>
+                <strong>Technical Presentation</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CURRENTLY LEARNING SECTION -->
+    <section class="learning-section section-padding bg-alt scroll-reveal">
+      <div class="container">
+        <div class="section-title-wrapper">
+          <span class="section-subtitle">Preparation & Exploration</span>
+          <h2 class="section-title">Currently Learning</h2>
+        </div>
+
+        <div class="learning-grid">
+          <!-- Main DSA Card -->
+          <div class="learning-main-card">
+            <div class="learning-card-header">
+              <div class="learning-header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"/></svg>
+              </div>
+              <div>
+                <h3>Java & Data Structures & Algorithms</h3>
+                <p>Strengthening problem-solving foundation for technical assessments.</p>
+              </div>
+            </div>
+            <div class="learning-topics-grid">
+              <div class="topic-item"><span class="topic-indicator status-mastered"></span> Arrays</div>
+              <div class="topic-item"><span class="topic-indicator status-mastered"></span> Strings</div>
+              <div class="topic-item"><span class="topic-indicator status-mastered"></span> Basic Mathematics</div>
+              <div class="topic-item"><span class="topic-indicator status-learning"></span> Linked Lists</div>
+              <div class="topic-item"><span class="topic-indicator status-learning"></span> Stacks</div>
+              <div class="topic-item"><span class="topic-indicator status-learning"></span> Queues</div>
+              <div class="topic-item"><span class="topic-indicator status-learning"></span> Hashing</div>
+              <div class="topic-item"><span class="topic-indicator status-next"></span> Trees</div>
+              <div class="topic-item"><span class="topic-indicator status-next"></span> Binary Search Trees</div>
+              <div class="topic-item"><span class="topic-indicator status-next"></span> Algorithms & Optimization</div>
+              <div class="topic-item"><span class="topic-indicator status-next"></span> Complex Problem Solving</div>
+            </div>
+            <div class="learning-legend">
+              <span><span class="legend-dot status-mastered"></span> Strong Foundation</span>
+              <span><span class="legend-dot status-learning"></span> Deepening Focus</span>
+              <span><span class="legend-dot status-next"></span> Upcoming Module</span>
+            </div>
+          </div>
+
+          <!-- Secondary Learning Card -->
+          <div class="learning-sub-card">
+            <h4 class="sub-card-title">Parallel Focus Areas</h4>
+            <ul class="learning-parallel-list">
+              <li>
+                <strong>Core Java Concepts</strong>
+                <span>JVM architecture, multithreading, and memory models.</span>
+              </li>
+              <li>
+                <strong>Database Management Systems</strong>
+                <span>Query normalization, SQL execution pipelines, indexing.</span>
+              </li>
+              <li>
+                <strong>Web Development</strong>
+                <span>Modern React hooks, state lifecycle, server connection logic.</span>
+              </li>
+              <li>
+                <strong>AI Application Design</strong>
+                <span>Function calling, prompt chains, context optimization.</span>
+              </li>
+              <li>
+                <strong>Software Engineering Practices</strong>
+                <span>Git architecture, modular code styling, testing fundamentals.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CERTIFICATIONS & BEYOND CODE -->
+    <section id="certifications" class="certifications-beyond-section section-padding scroll-mt scroll-reveal">
+      <div class="container certifications-beyond-grid">
+        <!-- Certifications -->
+        <div class="certifications-box">
+          <div class="section-title-wrapper">
+            <span class="section-subtitle">Verified Accomplishments</span>
+            <h2 class="section-title">Certifications</h2>
+          </div>
+          <div class="certifications-list">
+            <div class="cert-item-card">
+              <div class="cert-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="cert-details">
+                <h4>MongoDB Certification</h4>
+                <span>Database Structure & Operations</span>
+              </div>
+            </div>
+            
+            <div class="cert-item-card">
+              <div class="cert-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="cert-details">
+                <h4>Infosys Springboard Certifications</h4>
+                <span>Software Foundations & Core Technologies</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Beyond Code -->
+        <div class="beyond-code-box">
+          <div class="section-title-wrapper">
+            <span class="section-subtitle">Outside the Workspace</span>
+            <h2 class="section-title">Beyond Code</h2>
+          </div>
+          <div class="beyond-card">
+            <p>
+              Outside technology, I enjoy creativity and entrepreneurship. I run a small crochet business, <strong>Loop and Love</strong>, where I create handmade products and manage product design, customer communication, orders, and promotion.
+            </p>
+            <div class="crochet-badge-grid">
+              <span class="crochet-badge">Creativity</span>
+              <span class="crochet-badge">Time Management</span>
+              <span class="crochet-badge">Customer Communication</span>
+              <span class="crochet-badge">Product Design</span>
+              <span class="crochet-badge">Entrepreneurship</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="contact-section section-padding bg-alt scroll-mt scroll-reveal">
+      <div class="container contact-grid">
+        <!-- Contact Content -->
+        <div class="contact-info">
+          <div class="section-title-wrapper">
+            <span class="section-subtitle">Get In Touch</span>
+            <h2 class="section-title">Let's Build Something Together.</h2>
+          </div>
+          <p class="contact-desc">
+            Have an interesting project, opportunity, or idea? I'd love to hear from you. Feel free to reach out via the form or social channels.
+          </p>
+
+          <div class="contact-methods">
+            <div class="contact-method-item">
+              <div class="method-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div class="method-details">
+                <span>Email directly</span>
+                <a href="mailto:riyaladwa9@gmail.com" class="method-link">riyaladwa9@gmail.com</a>
+              </div>
+            </div>
+
+            <div class="contact-method-item">
+              <div class="method-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              </div>
+              <div class="method-details">
+                <span>Professional Profile</span>
+                <a href="https://www.linkedin.com/in/riya-ladwa-b25275306" target="_blank" rel="noopener noreferrer" class="method-link">linkedin.com/in/riya-ladwa-b25275306</a>
+              </div>
+            </div>
+
+            <div class="contact-method-item">
+              <div class="method-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              </div>
+              <div class="method-details">
+                <span>Code Repositories</span>
+                <a href="https://github.com/riyaladwa" target="_blank" rel="noopener noreferrer" class="method-link">github.com/riyaladwa</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form Card -->
+        <div class="contact-form-card">
+          <form id="contact-form" class="contact-form" action="#" method="POST" novalidate>
+            <div class="form-group">
+              <label for="contact-name">Full Name <span class="required">*</span></label>
+              <input type="text" id="contact-name" name="name" class="form-control" placeholder="Enter your name" required autocomplete="name">
+              <div class="form-error-msg" id="name-error" aria-live="polite">Please enter your name.</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="contact-email">Email Address <span class="required">*</span></label>
+              <input type="email" id="contact-email" name="email" class="form-control" placeholder="name@company.com" required autocomplete="email">
+              <div class="form-error-msg" id="email-error" aria-live="polite">Please enter a valid email address.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-message">Message <span class="required">*</span></label>
+              <textarea id="contact-message" name="message" class="form-control" rows="5" placeholder="Share your project idea, questions or inquiries..." required></textarea>
+              <div class="form-error-msg" id="message-error" aria-live="polite">Please write your message.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+              <span>Send Message</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon-right"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <p class="copyright-text">&copy; 2026 Riya P Ladwa. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="https://github.com/riyaladwa" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/riya-ladwa-b25275306" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:riyaladwa9@gmail.com">Email</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Contact Form Feedback Dialog/Toast -->
+  <div class="feedback-toast" id="feedback-toast" role="alert" aria-live="assertive" aria-hidden="true">
+    <div class="toast-content">
+      <div class="toast-icon-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="toast-text-box">
+        <strong>Message Sent!</strong>
+        <span>Thank you for reaching out. Riya will get back to you shortly.</span>
+      </div>
+      <button class="toast-close" id="toast-close" aria-label="Close notification">&times;</button>
+    </div>
+  </div>
+
+  <!-- Entry Script -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
