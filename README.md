@@ -143,15 +143,8 @@ I am currently strengthening my skills in:
 * AI Application Development (Model chaining, Prompt engineering)
 
 ---
-
-## 🖼️ Screenshots
-
-> Screenshots will be added soon.
-
----
-
 ## 🤝 Connect With Me
 
 * **GitHub**: [github.com/riyaladwa](https://github.com/riyaladwa)
 * **LinkedIn**: [linkedin.com/in/riya-ladwa-b25275306](https://www.linkedin.com/in/riya-ladwa-b25275306)
-* **Live Link**: [[Live Portfolio]]
+
