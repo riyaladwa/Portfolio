@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #F9F9FB;
+  --color-backgroundAlt: #F4F2EB;
+  --color-primary: #121212;
+  --color-secondary: #555555;
+  --color-border: #E5E7EB;
+  --color-card: #FFFFFF;
+
+  --font-display: var(--font-display), Space Grotesk, sans-serif;
+  --font-body: var(--font-body), Inter, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(18, 18, 18, 0.1);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(18, 18, 18, 0.3);
+  }
+}
+
+@utility glassmorphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Custom transitions and helper styles */
+.magnetic-btn-wrap {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.text-reveal-word {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
