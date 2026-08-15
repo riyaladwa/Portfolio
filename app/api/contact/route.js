@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import clientPromise from '../../../lib/mongodb';
 import fs from 'fs';
 import path from 'path';
 
@@ -43,88 +44,40 @@ export async function POST(req) {
     }
 
     const newMessage = {
-      id: Date.now().toString(),
       name: name.trim(),
       email: email.trim(),
       message: message.trim(),
-      timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
 
     let savedToDatabase = false;
-    let dbType = '';
 
-    // 1. SUPABASE REST CONNECTOR
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    // 1. MONGODB ATLAS CONNECT
+    if (process.env.MONGODB_URI) {
       try {
-        console.log('[Supabase API] Attempting database insert...');
-        const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/messages`, {
-          method: 'POST',
-          headers: {
-            'apikey': process.env.SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            name: newMessage.name,
-            email: newMessage.email,
-            message: newMessage.message,
-            created_at: newMessage.timestamp
-          }),
-        });
-
-        if (response.ok) {
-          console.log('[Supabase API] Message saved successfully.');
-          savedToDatabase = true;
-          dbType = 'Supabase';
-        } else {
-          const errText = await response.text();
-          console.error('[Supabase API Error] Insert failed:', errText);
-        }
+        console.log('[MongoDB Driver] Connecting to database cluster...');
+        const client = await clientPromise;
+        const db = client.db('portfolio');
+        const collection = db.collection('messages');
+        
+        await collection.insertOne(newMessage);
+        console.log('[MongoDB Driver] Message saved successfully to Atlas database.');
+        savedToDatabase = true;
       } catch (err) {
-        console.error('[Supabase Integration Error] Connection failed:', err);
-      }
-    }
-
-    // 2. MONGODB ATLAS DATA API CONNECTOR
-    if (!savedToDatabase && process.env.MONGODB_DATA_API_URL && process.env.MONGODB_DATA_API_KEY) {
-      try {
-        console.log('[MongoDB Data API] Attempting database insert...');
-        const response = await fetch(`${process.env.MONGODB_DATA_API_URL}/action/insertOne`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Request-Headers': '*',
-            'api-key': process.env.MONGODB_DATA_API_KEY
-          },
-          body: JSON.stringify({
-            dataSource: process.env.MONGODB_DATA_SOURCE || 'Cluster0',
-            database: process.env.MONGODB_DATABASE || 'portfolio',
-            collection: process.env.MONGODB_COLLECTION || 'messages',
-            document: newMessage
-          })
-        });
-
-        if (response.ok) {
-          console.log('[MongoDB Data API] Message saved successfully.');
-          savedToDatabase = true;
-          dbType = 'MongoDB';
-        } else {
-          const errText = await response.text();
-          console.error('[MongoDB Data API Error] Insert failed:', errText);
-        }
-      } catch (err) {
-        console.error('[MongoDB Integration Error] Connection failed:', err);
+        console.error('[MongoDB Driver Error] Insert failed:', err);
       }
     }
 
     // Always keep a local copy in /tmp for safety & debugging
-    saveToLocalFallback(newMessage);
+    saveToLocalFallback({
+      id: Date.now().toString(),
+      ...newMessage
+    });
 
     return NextResponse.json({ 
       success: true, 
       message: savedToDatabase 
-        ? `Message sent and saved to ${dbType}!` 
+        ? 'Message sent and stored in MongoDB!' 
         : 'Message sent successfully!' 
     });
 
