@@ -21,6 +21,37 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+
+    let lenisInstance = null;
+    let rafId = null;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReducedMotion) {
+      import('lenis')
+        .then(({ default: Lenis }) => {
+          lenisInstance = new Lenis({
+            duration: 1.1,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            smoothWheel: true,
+          });
+
+          function raf(time) {
+            lenisInstance.raf(time);
+            rafId = requestAnimationFrame(raf);
+          }
+
+          rafId = requestAnimationFrame(raf);
+        })
+        .catch((err) => {
+          console.warn('[Scroll Engine] Lenis initialization skipped:', err.message);
+        });
+    }
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (lenisInstance) lenisInstance.destroy();
+    };
   }, []);
 
   return (

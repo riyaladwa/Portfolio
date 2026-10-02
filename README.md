@@ -16,10 +16,12 @@ This project features a client-server architecture including a custom-styled use
 * **Tools**: Git, GitHub, Vercel, Render, VS Code, Vite
 
 ### Project Stack (This Portfolio)
-* **Frontend**: Vanilla HTML5, CSS3 (CSS Variables, Flexbox, CSS Grid, Fluid Clamp sizing), ES6+ JavaScript.
-* **Framework / Bundler**: Vite
-* **Backend**: Node.js, Express.js (REST API)
-* **Database**: Local JSON storage (`data/messages.json`)
+* **Framework**: Next.js 16 (App Router with Turbopack) & React 19
+* **Styling & Motion**: Tailwind CSS v4, Framer Motion, Lenis Smooth Scroll, Lucide React
+* **Backend & API**: Next.js API Routes (`app/api/contact/route.js`)
+* **Database**: MongoDB Atlas Cluster (via official `mongodb` Node driver)
+* **Email Service**: Nodemailer with Gmail SMTP Integration
+* **Persistence Fallback**: Serverless file cache (`/tmp/messages.json`)
 
 ---
 
@@ -57,12 +59,11 @@ I developed this full-stack portfolio to:
 
 ## 🖥️ Portfolio Features & Design
 
-* **Staggered Animations**: Smooth wave-like reveals on load (`slideUpEntry`, `scaleUpEntry`, `photoEntrance`) using Gaussian blur transitions to focus text elements.
-* **Portrait Presentation**: Houses my professional portrait frame featuring subtle accent shifts on hover.
-* **Printable A4 Resume Layout**: Built-in print stylesheets (`@media print`) format the entire page as a clean single-page resume when saved as PDF or printed.
-* **Interactive Contact Form**: Client-side field validations, submit button loading states, and direct Express API connection.
-* **Local Persistence**: Serves contact requests and appends valid messages to local storage.
-* **Responsiveness**: Modular fluid typography scales layout automatically across desktop, tablet, and mobile displays.
+* **Staggered Animations**: Smooth wave-like reveals on load using Framer Motion and custom blur transitions.
+* **Interactive Contact Form**: Real-time validation, dynamic submission feedback, direct connection to MongoDB Atlas and automated Gmail notifications.
+* **Dual Persistence Layer**: Automatically writes submissions to MongoDB Atlas while keeping a `/tmp/messages.json` fallback.
+* **Responsive Layout**: Designed for seamless viewing across mobile, tablet, and ultra-wide screens.
+* **Smooth Scrolling**: Lenis physics-based inertial scrolling.
 
 ---
 
@@ -70,28 +71,27 @@ I developed this full-stack portfolio to:
 
 ```text
 portfolio/
-├── data/
-│   └── messages.json        # Database persistence layer (JSON Array)
-├── public/
-│   ├── images/
-│   │   └── riya.jpeg        # Professional Portrait Photo
-│   ├── favicon.svg
-│   ├── icons.svg
-│   └── resume.pdf           # Downloadable Resume PDF
-├── src/
-│   ├── main.js              # Client validation, staggers, and API fetch calls
-│   └── style.css            # Responsive styles, project card visual mocks, and Print query
-├── index.html               # Main markup document with preloads and metadata
-├── package.json             # Build and execution script configuration
-├── server.js                # Express API Backend & static server routing
-└── vite.config.js           # API dev proxy routing
+├── app/
+│   ├── api/
+│   │   └── contact/
+│   │       └── route.js     # Next.js API Route for contact submissions & SMTP trigger
+│   ├── globals.css          # Tailwind CSS v4 styling & CSS variables
+│   ├── layout.jsx           # Root layout with fonts, metadata, and smooth scroll
+│   └── page.jsx             # Portfolio single-page layout composition
+├── components/              # Modular UI components (Hero, About, Projects, Contact, etc.)
+├── lib/
+│   └── mongodb.js           # Reusable MongoDB Atlas connection pool
+├── public/                  # Static assets (images, icons, resume.pdf)
+├── .env.local               # Environment variables (MongoDB URI & Gmail SMTP)
+├── package.json             # Next.js dependencies & scripts
+└── next.config.js           # Next.js configuration
 ```
 
 ---
 
 ## 💻 Run Locally
 
-Ensure you have **Node.js** and **npm** installed on your system.
+Ensure you have **Node.js** (v18+) and **npm** installed on your system.
 
 ### 1. Installation
 Clone the repository and install dependency packages:
@@ -101,26 +101,32 @@ cd portfolio
 npm install
 ```
 
-### 2. Launch Development Environment
-Launch the concurrent developer environment:
+### 2. Configure Environment Variables
+Create a `.env.local` file in the project root:
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?appName=Cluster0
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_gmail_app_password
+EMAIL_TO=recipient_email@gmail.com
+```
+
+### 3. Launch Development Server
 ```bash
 npm run dev
 ```
-* **Client Frontend (Vite)**: Ready on [http://localhost:5173/](http://localhost:5173/) (or `http://localhost:5174/`).
-* **API Backend (Express)**: Live on port `3000`.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
 ## 📦 Build & Production
 
 ### 1. Build Client Assets
-Compile and bundle front-end files into `/dist`:
+Compile the optimized Next.js production build:
 ```bash
 npm run build
 ```
 
-### 2. Serve Static Production Output
-Start the Express static server to host files on port `3000`:
+### 2. Start Production Server
 ```bash
 npm start
 ```
@@ -129,7 +135,15 @@ npm start
 
 ## 🌐 Deployment
 
-This portfolio is configured for deployment on **Vercel** or **Render**. Connect the GitHub repository directly to Vercel/Render, set the root directory to the project root, build command to `npm run build`, and run start to trigger compilation.
+This portfolio is optimized for deployment on **Vercel**:
+1. Push your repository to GitHub.
+2. Import the project into your Vercel Dashboard.
+3. In **Settings > Environment Variables**, add:
+   * `MONGODB_URI` (MongoDB Atlas connection string)
+   * `EMAIL_TO` (Recipient address for portfolio inquiries, e.g. `riyaladwa9@gmail.com`)
+   * For Gmail SMTP: `EMAIL_USER` & `EMAIL_PASS` (16-char Google App Password)
+   * OR for Resend API: `RESEND_API_KEY` (and optionally `RESEND_FROM`)
+4. Deploy! Next.js App Router and API routes will function as serverless edge/lambda handlers.
 
 ---
 

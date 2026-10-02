@@ -57,9 +57,13 @@ export default function Navbar() {
   const handleNavClick = (e, id) => {
     e.preventDefault();
     setMobileMenuOpen(false);
+    if (id === 'hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     const target = document.getElementById(id);
     if (target) {
-      const yOffset = -100;
+      const yOffset = -90;
       const y = target.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
@@ -115,8 +119,20 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Availability Capsule */}
-          <div className="flex items-center gap-4">
+          {/* Actions & Availability Capsule */}
+          <div className="flex items-center gap-3">
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              download="Riya_Ladwa_Resume.pdf"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-border/80 hover:border-primary text-secondary hover:text-primary rounded-full text-[10px] tracking-wider font-display font-bold uppercase transition-colors duration-200"
+              title="Download Riya Ladwa's Resume (PDF)"
+            >
+              <span>RESUME</span>
+              <span className="text-[9px] opacity-60">↗</span>
+            </a>
+
             <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-100 rounded-full text-[10px] text-green-700 tracking-wider font-semibold uppercase">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
               AVAILABLE
@@ -186,6 +202,17 @@ export default function Navbar() {
                     </a>
                   );
                 })}
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download="Riya_Ladwa_Resume.pdf"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-lg font-display font-bold tracking-widest py-2 border-b border-border/50 text-secondary hover:text-primary hover:pl-2 transition-all duration-300 flex items-center justify-between"
+                >
+                  <span>RESUME</span>
+                  <span className="text-xs font-mono font-normal opacity-60">PDF ↗</span>
+                </a>
               </div>
               <div className="flex items-center justify-center gap-2 p-3 bg-green-50 border border-green-100 rounded-2xl text-[10px] text-green-700 font-bold uppercase tracking-widest">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

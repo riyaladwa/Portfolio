@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Github, Linkedin, Send } from 'lucide-react';
+import { Mail, Github, Linkedin, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const SOCIALS = [
   {
@@ -32,20 +32,52 @@ export default function Contact() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   
   // Form States
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ type: null, message: '' });
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const tempErrors = {};
-    if (!form.name.trim()) tempErrors.name = 'Please enter your name.';
-    if (!form.email.trim()) {
-      tempErrors.email = 'Please enter your email.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      tempErrors.email = 'Please enter a valid email address.';
+    const trimmedName = form.name.trim();
+    const trimmedEmail = form.email.trim();
+    const trimmedSubject = form.subject.trim();
+    const trimmedMessage = form.message.trim();
+
+    // Name Validation
+    if (!trimmedName) {
+      tempErrors.name = 'Please enter your name.';
+    } else if (trimmedName.length > 100) {
+      tempErrors.name = 'Name must be 100 characters or less.';
     }
-    if (!form.message.trim()) tempErrors.message = 'Please write a message.';
+
+    // Email Validation
+    if (!trimmedEmail) {
+      tempErrors.email = 'Please enter your email.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      tempErrors.email = 'Please enter a valid email address.';
+    } else if (trimmedEmail.length > 254) {
+      tempErrors.email = 'Email address is too long.';
+    }
+
+    // Subject Validation
+    if (!trimmedSubject) {
+      tempErrors.subject = 'Please enter a subject.';
+    } else if (trimmedSubject.length < 2) {
+      tempErrors.subject = 'Subject must be at least 2 characters.';
+    } else if (trimmedSubject.length > 200) {
+      tempErrors.subject = 'Subject must be 200 characters or less.';
+    }
+
+    // Message Validation
+    if (!trimmedMessage) {
+      tempErrors.message = 'Please write a message.';
+    } else if (trimmedMessage.length < 10) {
+      tempErrors.message = 'Message must be at least 10 characters long.';
+    } else if (trimmedMessage.length > 5000) {
+      tempErrors.message = 'Message must be 5000 characters or less.';
+    }
     
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -62,6 +94,7 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent double submission
     if (!validate()) return;
 
     setLoading(true);
@@ -73,20 +106,33 @@ export default function Contact() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          ...form,
+          honeypot,
+        })
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setStatus({ type: 'success', message: 'Message sent! Thank you, Riya will get back to you shortly.' });
-        setForm({ name: '', email: '', message: '' });
+        setStatus({
+          type: 'success',
+          message: data.message || 'Message sent! Thank you, Riya will get back to you shortly.'
+        });
+        setForm({ name: '', email: '', subject: '', message: '' });
+        setHoneypot('');
       } else {
-        setStatus({ type: 'error', message: data.error || 'Failed to send message.' });
+        setStatus({
+          type: 'error',
+          message: data.error || 'Failed to send message. Please try again.'
+        });
       }
     } catch (err) {
       console.error('[API Connection Error] Submission failed:', err);
-      setStatus({ type: 'error', message: 'Connection error. Please check if Next.js server is active.' });
+      setStatus({
+        type: 'error',
+        message: 'Network error. Please verify your connection or email directly at riyaladwa9@gmail.com.'
+      });
     } finally {
       setLoading(false);
     }
@@ -154,6 +200,20 @@ export default function Contact() {
         <div className="lg:col-span-6 w-full bg-backgroundAlt/20 border border-border/60 p-6 md:p-10 rounded-[2.5rem]">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
             
+            {/* Honeypot Spam Protection Field (Hidden from real users) */}
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="company_website">Do not fill this field</label>
+              <input
+                type="text"
+                id="company_website"
+                name="company_website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             {/* Name Input */}
             <div className="flex flex-col gap-2">
               <label htmlFor="name" className="text-[10px] font-display font-black tracking-widest text-secondary uppercase">
@@ -165,6 +225,7 @@ export default function Contact() {
                 name="name"
                 value={form.name}
                 onChange={handleInputChange}
+                maxLength={100}
                 className={`w-full bg-white border px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors duration-200 ${
                   errors.name ? 'border-red-500 bg-red-50/10' : 'border-border'
                 }`}
@@ -186,6 +247,7 @@ export default function Contact() {
                 name="email"
                 value={form.email}
                 onChange={handleInputChange}
+                maxLength={254}
                 className={`w-full bg-white border px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors duration-200 ${
                   errors.email ? 'border-red-500 bg-red-50/10' : 'border-border'
                 }`}
@@ -193,6 +255,28 @@ export default function Contact() {
               />
               {errors.email && (
                 <span className="text-[10px] text-red-500 font-semibold">{errors.email}</span>
+              )}
+            </div>
+
+            {/* Subject Input */}
+            <div className="flex flex-col gap-2">
+              <label htmlFor="subject" className="text-[10px] font-display font-black tracking-widest text-secondary uppercase">
+                SUBJECT <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                value={form.subject}
+                onChange={handleInputChange}
+                maxLength={200}
+                className={`w-full bg-white border px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors duration-200 ${
+                  errors.subject ? 'border-red-500 bg-red-50/10' : 'border-border'
+                }`}
+                placeholder="Project inquiry, collaboration, or opportunity..."
+              />
+              {errors.subject && (
+                <span className="text-[10px] text-red-500 font-semibold">{errors.subject}</span>
               )}
             </div>
 
@@ -207,10 +291,11 @@ export default function Contact() {
                 rows={5}
                 value={form.message}
                 onChange={handleInputChange}
+                maxLength={5000}
                 className={`w-full bg-white border px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors duration-200 resize-none ${
                   errors.message ? 'border-red-500 bg-red-50/10' : 'border-border'
                 }`}
-                placeholder="Share your project idea, questions or inquiries..."
+                placeholder="Share your project idea, questions or inquiries (min 10 characters)..."
               />
               {errors.message && (
                 <span className="text-[10px] text-red-500 font-semibold">{errors.message}</span>
@@ -220,13 +305,18 @@ export default function Contact() {
             {/* Form Response Alert */}
             {status.message && (
               <div 
-                className={`px-4 py-3 rounded-xl text-xs font-semibold ${
+                className={`px-4 py-3 rounded-xl text-xs font-semibold flex items-start gap-2.5 transition-all duration-300 ${
                   status.type === 'success' 
-                    ? 'bg-green-50 border border-green-100 text-green-700' 
-                    : 'bg-red-50 border border-red-100 text-red-700'
+                    ? 'bg-green-50 border border-green-200 text-green-800' 
+                    : 'bg-red-50 border border-red-200 text-red-800'
                 }`}
               >
-                {status.message}
+                {status.type === 'success' ? (
+                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+                )}
+                <span className="leading-relaxed">{status.message}</span>
               </div>
             )}
 
@@ -234,10 +324,13 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-white hover:bg-secondary text-xs font-display font-black tracking-widest py-4 rounded-xl transition-all duration-300 disabled:opacity-55 flex items-center justify-center gap-2"
+              className="w-full bg-primary text-white hover:bg-secondary text-xs font-display font-black tracking-widest py-4 rounded-xl transition-all duration-300 disabled:opacity-55 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
             >
               {loading ? (
-                <span>SENDING...</span>
+                <>
+                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>SENDING MESSAGE...</span>
+                </>
               ) : (
                 <>
                   <span>SEND MESSAGE</span>

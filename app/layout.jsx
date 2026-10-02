@@ -19,6 +19,11 @@ export const metadata = {
   title: 'Riya Ladwa | CSE Student & Developer',
   description: 'Personal portfolio of Riya Ladwa, a Computer Science & Engineering student building AI-powered web applications and strengthening problem-solving through Java & DSA.',
   metadataBase: new URL('https://riyaladwa.dev'),
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   openGraph: {
     type: 'website',
     url: 'https://riyaladwa.dev',
