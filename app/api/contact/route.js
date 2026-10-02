@@ -64,6 +64,78 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
+// Diagnose and classify MongoDB errors accurately without leaking secrets
+function diagnoseDatabaseError(err) {
+  const code = err?.code;
+  const name = err?.name;
+  const rawMsg = err?.message || '';
+
+  // 1. Missing environment variable
+  if (code === 'CONFIG_MISSING' || !process.env.MONGODB_URI) {
+    return {
+      type: 'CONFIG_MISSING',
+      log: '[MongoDB Config Error] MONGODB_URI environment variable is not defined on the server.',
+      userError: 'Database service is temporarily unconfigured. Please ensure MONGODB_URI is set in the hosting dashboard.',
+      status: 503,
+    };
+  }
+
+  // 2. Authentication failure (bad username or password)
+  if (code === 8000 || rawMsg.includes('Authentication failed') || rawMsg.includes('bad auth')) {
+    return {
+      type: 'AUTH_FAILED',
+      log: `[MongoDB Auth Error] Authentication failed for database user (code: ${code || '8000'}). Verify user and password in MONGODB_URI.`,
+      userError: 'Database authentication failed. Please verify database user credentials in project settings.',
+      status: 500,
+    };
+  }
+
+  // 3. Network Access / IP Whitelist / Connection Timeout
+  if (
+    name === 'MongoServerSelectionError' ||
+    name === 'MongoNetworkTimeoutError' ||
+    rawMsg.includes('Server selection timed out') ||
+    rawMsg.includes('ETIMEDOUT') ||
+    rawMsg.includes('timed out after') ||
+    rawMsg.includes('connection timed out')
+  ) {
+    return {
+      type: 'NETWORK_TIMEOUT',
+      log: `[MongoDB Network Timeout] Server selection timed out (${rawMsg}). Root cause: The server IP is likely blocked by MongoDB Atlas Network Access. In MongoDB Atlas > Network Access, add 0.0.0.0/0 to allow connections from cloud hosting (e.g., Vercel).`,
+      userError: 'Database connection timed out. Please check that MongoDB Atlas Network Access allows traffic from anywhere (0.0.0.0/0).',
+      status: 504,
+    };
+  }
+
+  // 4. DNS / Host Resolution Failure
+  if (rawMsg.includes('ENOTFOUND') || rawMsg.includes('ECONNREFUSED') || rawMsg.includes('querySrv ENOTFOUND')) {
+    return {
+      type: 'DNS_NETWORK_REFUSED',
+      log: `[MongoDB DNS/Connection Error] Unable to resolve cluster hostname: ${rawMsg}. Check cluster address in MONGODB_URI.`,
+      userError: 'Unable to reach the MongoDB Atlas cluster. Please verify the cluster hostname.',
+      status: 503,
+    };
+  }
+
+  // 5. Document Insertion / Validation / Write Error
+  if (name === 'MongoWriteException' || name === 'MongoBulkWriteError' || code === 11000 || rawMsg.includes('insertOne')) {
+    return {
+      type: 'INSERTION_ERROR',
+      log: `[MongoDB Insertion Error] Failed to write document into collection: ${rawMsg} (code: ${code || 'N/A'}).`,
+      userError: 'Failed to insert message into database. Please try again.',
+      status: 500,
+    };
+  }
+
+  // 6. General Database Error
+  return {
+    type: 'DATABASE_ERROR',
+    log: `[MongoDB General Error] ${rawMsg} (name: ${name || 'N/A'}, code: ${code || 'N/A'}).`,
+    userError: 'A database error occurred while processing your request. Please reach out directly to riyaladwa9@gmail.com.',
+    status: 500,
+  };
+}
+
 // Local serverless fallback cache (safety net)
 const MESSAGES_FILE = path.join('/tmp', 'messages.json');
 const saveToLocalFallback = (doc) => {
@@ -236,22 +308,24 @@ export async function POST(req) {
       // Ensure helpful index asynchronously
       messagesCollection.createIndex({ createdAt: -1 }).catch(() => {});
     } catch (dbErr) {
-      console.error('[MongoDB Atlas Error] Database insertion failed:', dbErr.message);
+      const diagnostic = diagnoseDatabaseError(dbErr);
+      console.error(diagnostic.log);
       
       // Save to local emergency cache
       saveToLocalFallback({
         ...cleanData,
         createdAt: new Date().toISOString(),
-        db_error: dbErr.message,
+        db_error: diagnostic.type,
       });
 
-      // Strict requirement: If database storage fails, return an error rather than false success
+      // Return distinct, safe error to frontend
       return NextResponse.json(
         {
           success: false,
-          error: 'Database connection failed. Unable to store your message. Please reach out directly to riyaladwa9@gmail.com.',
+          error: diagnostic.userError,
+          errorType: diagnostic.type,
         },
-        { status: 500 }
+        { status: diagnostic.status }
       );
     }
 
