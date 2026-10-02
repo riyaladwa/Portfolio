@@ -100,7 +100,7 @@ export default function About() {
               I enjoy translating logical principles and algorithm constructs into functional, highly-polished digital applications. My development work encompasses full-stack software applications, Gemini/OpenAI API integrations, databases, and secure web architectures. Through hackathons and continuous building, I focus on solving practical problems.
             </p>
             <p>
-              Currently, I am deep-diving into <strong className="text-primary font-bold">Java & Data Structures and Algorithms (DSA)</strong> to strengthen my computer science fundamentals, prepare for technical assessments, and build applications that create value.
+              With a strong foundation in <strong className="text-primary font-bold">Data Structures & Algorithms (100+ LeetCode problems solved)</strong> and core CS fundamentals, I focus on building scalable full-stack applications, integrating LLM/AI workflows, and delivering systems that solve real-world problems.
             </p>
           </motion.div>
 

@@ -98,7 +98,7 @@ export default function Contact() {
     if (!validate()) return;
 
     setLoading(true);
-    setStatus({ type: null, message: '' });
+    setStatus({ type: null, message: '', mailto: null });
 
     try {
       const response = await fetch('/api/contact', {
@@ -117,21 +117,36 @@ export default function Contact() {
       if (response.ok && data.success) {
         setStatus({
           type: 'success',
-          message: data.message || 'Message sent! Thank you, Riya will get back to you shortly.'
+          message: data.message || 'Message sent! Thank you, Riya will get back to you shortly.',
+          mailto: data.mailto || null,
         });
-        setForm({ name: '', email: '', subject: '', message: '' });
-        setHoneypot('');
+        if (!data.fallbackRequired) {
+          setForm({ name: '', email: '', subject: '', message: '' });
+          setHoneypot('');
+        }
       } else {
+        const directMailto = `mailto:riyaladwa9@gmail.com?subject=${encodeURIComponent(
+          form.subject || 'Portfolio Inquiry'
+        )}&body=${encodeURIComponent(
+          `Hi Riya,\n\n${form.message}\n\n---\nName: ${form.name}\nEmail: ${form.email}`
+        )}`;
         setStatus({
           type: 'error',
-          message: data.error || 'Failed to send message. Please try again.'
+          message: data.error || 'Server email delivery is currently unconfigured. Click below to send directly via your mail client:',
+          mailto: directMailto,
         });
       }
     } catch (err) {
       console.error('[API Connection Error] Submission failed:', err);
+      const directMailto = `mailto:riyaladwa9@gmail.com?subject=${encodeURIComponent(
+        form.subject || 'Portfolio Inquiry'
+      )}&body=${encodeURIComponent(
+        `Hi Riya,\n\n${form.message}\n\n---\nName: ${form.name}\nEmail: ${form.email}`
+      )}`;
       setStatus({
         type: 'error',
-        message: 'Network error. Please verify your connection or email directly at riyaladwa9@gmail.com.'
+        message: 'Network issue. Click below to send directly to riyaladwa9@gmail.com:',
+        mailto: directMailto,
       });
     } finally {
       setLoading(false);
@@ -305,18 +320,29 @@ export default function Contact() {
             {/* Form Response Alert */}
             {status.message && (
               <div 
-                className={`px-4 py-3 rounded-xl text-xs font-semibold flex items-start gap-2.5 transition-all duration-300 ${
+                className={`px-4 py-3 rounded-xl text-xs font-semibold flex flex-col gap-2 transition-all duration-300 ${
                   status.type === 'success' 
                     ? 'bg-green-50 border border-green-200 text-green-800' 
                     : 'bg-red-50 border border-red-200 text-red-800'
                 }`}
               >
-                {status.type === 'success' ? (
-                  <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
-                ) : (
-                  <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2.5">
+                  {status.type === 'success' ? (
+                    <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+                  )}
+                  <span className="leading-relaxed">{status.message}</span>
+                </div>
+                {status.mailto && (
+                  <a
+                    href={status.mailto}
+                    className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 bg-primary text-white hover:bg-secondary rounded-lg text-[10px] font-display font-black tracking-wider uppercase transition-colors duration-200 shadow-sm"
+                  >
+                    <Mail size={12} />
+                    <span>Open Pre-filled Email in Gmail / Mail App ↗</span>
+                  </a>
                 )}
-                <span className="leading-relaxed">{status.message}</span>
               </div>
             )}
 

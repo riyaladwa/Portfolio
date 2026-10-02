@@ -13,23 +13,28 @@ import {
   Github, 
   Globe, 
   Cpu, 
-  Boxes 
+  Boxes,
+  Server,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 const TECHS = [
   { name: 'Java', icon: Coffee, desc: 'Object-oriented language for robust systems', size: 'large', rotate: '-2deg' },
   { name: 'Python', icon: Terminal, desc: 'Scripting and AI integrations', size: 'medium', rotate: '1deg' },
-  { name: 'JavaScript', icon: Code2, desc: 'Interactive web applications', size: 'large', rotate: '-1deg' },
-  { name: 'React', icon: Atom, desc: 'Modern component-based user interfaces', size: 'large', rotate: '2deg' },
-  { name: 'HTML', icon: Code2, desc: 'Semantic web structure', size: 'small', rotate: '-3deg' },
-  { name: 'CSS', icon: Braces, desc: 'Responsive visual presentation', size: 'small', rotate: '3deg' },
-  { name: 'Tailwind CSS', icon: Wind, desc: 'Utility-first rapid styling', size: 'medium', rotate: '-2deg' },
-  { name: 'Supabase', icon: Database, desc: 'Realtime database and authentication services', size: 'medium', rotate: '2deg' },
-  { name: 'Git', icon: GitBranch, desc: 'Distributed version control', size: 'small', rotate: '-1deg' },
-  { name: 'GitHub', icon: Github, desc: 'Collaboration and project hosting', size: 'medium', rotate: '1deg' },
-  { name: 'REST APIs', icon: Globe, desc: 'Stateless server communications', size: 'medium', rotate: '-3deg' },
-  { name: 'DSA', icon: Cpu, desc: 'Data Structures & Algorithms problem-solving', size: 'large', rotate: '3deg' },
-  { name: 'OOP', icon: Boxes, desc: 'Object-Oriented Programming principles', size: 'medium', rotate: '-2deg' },
+  { name: 'JavaScript', icon: Code2, desc: 'Interactive modern web applications', size: 'large', rotate: '-1deg' },
+  { name: 'TypeScript', icon: Code2, desc: 'Type-safe scalable JavaScript architecture', size: 'medium', rotate: '2deg' },
+  { name: 'React', icon: Atom, desc: 'Component-driven interactive user interfaces', size: 'large', rotate: '-2deg' },
+  { name: 'Next.js', icon: Layers, desc: 'Full-stack React framework & serverless routes', size: 'large', rotate: '1deg' },
+  { name: 'Node.js', icon: Server, desc: 'Scalable backend runtime & Express.js APIs', size: 'large', rotate: '-3deg' },
+  { name: 'Tailwind CSS', icon: Wind, desc: 'Utility-first rapid styling & responsive layouts', size: 'medium', rotate: '2deg' },
+  { name: 'MongoDB', icon: Database, desc: 'NoSQL document database with Atlas cloud', size: 'medium', rotate: '-1deg' },
+  { name: 'Supabase', icon: Database, desc: 'PostgreSQL database and realtime auth', size: 'medium', rotate: '2deg' },
+  { name: 'AI APIs', icon: Sparkles, desc: 'Gemini API & OpenAI multimodal integration', size: 'large', rotate: '-2deg' },
+  { name: 'REST APIs', icon: Globe, desc: 'RESTful API architecture & JWT authentication', size: 'medium', rotate: '1deg' },
+  { name: 'DSA', icon: Cpu, desc: '100+ LeetCode problems solved across DSA', size: 'large', rotate: '3deg' },
+  { name: 'OOP', icon: Boxes, desc: 'Object-Oriented Programming principles & design', size: 'medium', rotate: '-2deg' },
+  { name: 'Git & GitHub', icon: Github, desc: 'Distributed version control & team workflows', size: 'medium', rotate: '1deg' },
 ];
 
 export default function TechStack() {
