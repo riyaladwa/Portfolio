@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server.js';
-import clientPromise from '../../../lib/mongodb.js';
+import { getDatabase } from '../../../lib/mongodb.js';
 import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
 
-// Rate Limiter: Map of IP -> array of timestamps
+// In-memory Rate Limiter: Max 5 submissions per 15 minutes per IP
 const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_REQUESTS_PER_WINDOW = 5; // Max 5 submissions per 15 minutes
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const MAX_REQUESTS_PER_WINDOW = 5;
 
 function isRateLimited(ip) {
   const now = Date.now();
   const windowStart = now - RATE_LIMIT_WINDOW_MS;
   const timestamps = rateLimitMap.get(ip) || [];
 
-  // Filter out timestamps outside the active window
   const activeTimestamps = timestamps.filter((ts) => ts > windowStart);
 
   if (activeTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
@@ -26,22 +25,35 @@ function isRateLimited(ip) {
   activeTimestamps.push(now);
   rateLimitMap.set(ip, activeTimestamps);
 
-  // Periodically clean up old IPs from the map
+  // Periodically clean up old IPs
   if (rateLimitMap.size > 1000) {
     for (const [key, list] of rateLimitMap.entries()) {
       const recent = list.filter((ts) => ts > windowStart);
-      if (recent.length === 0) {
-        rateLimitMap.delete(key);
-      } else {
-        rateLimitMap.set(key, recent);
-      }
+      if (recent.length === 0) rateLimitMap.delete(key);
+      else rateLimitMap.set(key, recent);
     }
   }
 
   return false;
 }
 
-// Helper to escape HTML characters for safe inclusion in email HTML
+// Anonymize IP for privacy
+function anonymizeIp(ip) {
+  if (!ip || ip === 'anonymous-client') return 'anonymous';
+  if (ip.includes('.')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) return `${parts[0]}.${parts[1]}.xxx.xxx`;
+  }
+  return 'masked-ip';
+}
+
+// Strip newline characters to prevent email header injection
+function sanitizeHeader(input) {
+  if (!input) return '';
+  return String(input).replace(/[\r\n\t]/g, ' ').trim();
+}
+
+// Escape HTML for email body
 function escapeHtml(text) {
   if (!text) return '';
   return String(text)
@@ -52,9 +64,9 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
-// Local serverless fallback cache
+// Local serverless fallback cache (safety net)
 const MESSAGES_FILE = path.join('/tmp', 'messages.json');
-const saveToLocalFallback = (newMessage) => {
+const saveToLocalFallback = (doc) => {
   try {
     let messages = [];
     if (fs.existsSync(MESSAGES_FILE)) {
@@ -65,21 +77,35 @@ const saveToLocalFallback = (newMessage) => {
         messages = [];
       }
     }
-    messages.push(newMessage);
+    messages.push(doc);
     const dir = path.dirname(MESSAGES_FILE);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(MESSAGES_FILE, JSON.stringify(messages, null, 2));
-    console.log('[Fallback Cache] Saved message successfully to /tmp/messages.json');
-  } catch (error) {
-    console.error('[Fallback Cache Error] Failed to write to temp directory:', error.message);
+    console.log('[Fallback Cache] Saved message to /tmp/messages.json');
+  } catch (err) {
+    console.error('[Fallback Cache Error] Failed to write fallback:', err.message);
   }
 };
 
+// Handle CORS Pre-flight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
 export async function POST(req) {
   try {
-    // 1. IP Rate Limiting Check
+    // --------------------------------------------------------------------------
+    // 1. RATE LIMITING & PAYLOAD VALIDATION
+    // --------------------------------------------------------------------------
     const ip =
       req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       req.headers.get('x-real-ip') ||
@@ -89,13 +115,12 @@ export async function POST(req) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Too many requests. Please wait a few minutes before submitting another message.',
+          error: 'Too many submissions. Please wait 15 minutes before submitting again.',
         },
         { status: 429 }
       );
     }
 
-    // 2. Parse and Validate Request Payload
     let body;
     try {
       body = await req.json();
@@ -108,7 +133,7 @@ export async function POST(req) {
 
     const { name, email, subject, message, honeypot } = body;
 
-    // Spam Protection: Honeypot field must be empty
+    // Honeypot spam check
     if (honeypot && String(honeypot).trim() !== '') {
       console.warn(`[Spam Guard] Rejected honeypot submission from IP: ${ip}`);
       return NextResponse.json(
@@ -117,7 +142,7 @@ export async function POST(req) {
       );
     }
 
-    // Full Name Validation
+    // Name Validation
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
         { success: false, error: 'Full name is required.' },
@@ -131,8 +156,8 @@ export async function POST(req) {
       );
     }
 
-    // Email Address Validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Email Validation (RFC 5322 simplified standard regex)
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!email || typeof email !== 'string' || !emailRegex.test(email.trim())) {
       return NextResponse.json(
         { success: false, error: 'A valid email address is required.' },
@@ -141,101 +166,123 @@ export async function POST(req) {
     }
     if (email.trim().length > 254) {
       return NextResponse.json(
-        { success: false, error: 'Email address exceeds maximum length.' },
+        { success: false, error: 'Email address exceeds maximum permitted length.' },
         { status: 400 }
       );
     }
 
-    // Subject Validation
-    if (!subject || typeof subject !== 'string' || subject.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Subject is required.' },
-        { status: 400 }
-      );
-    }
-    if (subject.trim().length > 200) {
-      return NextResponse.json(
-        { success: false, error: 'Subject must be 200 characters or less.' },
-        { status: 400 }
-      );
-    }
+    // Subject Validation (optional, default provided if omitted)
+    const cleanSubject = subject && typeof subject === 'string' && subject.trim().length > 0
+      ? sanitizeHeader(subject.trim().substring(0, 200))
+      : 'Portfolio Inquiry';
 
-    // Message Validation (reject empty or whitespace-only)
+    // Message Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return NextResponse.json(
         { success: false, error: 'Message cannot be empty.' },
         { status: 400 }
       );
     }
-    if (message.trim().length < 10) {
+    if (message.trim().length < 5) {
       return NextResponse.json(
-        { success: false, error: 'Message must be at least 10 characters long.' },
+        { success: false, error: 'Message must be at least 5 characters long.' },
         { status: 400 }
       );
     }
     if (message.trim().length > 5000) {
       return NextResponse.json(
-        { success: false, error: 'Message must be 5000 characters or less.' },
+        { success: false, error: 'Message exceeds maximum limit of 5,000 characters.' },
         { status: 400 }
       );
     }
 
     const cleanData = {
-      name: name.trim(),
-      email: email.trim(),
-      subject: subject.trim(),
+      name: sanitizeHeader(name.trim()),
+      email: sanitizeHeader(email.trim().toLowerCase()),
+      subject: cleanSubject,
       message: message.trim(),
-      created_at: new Date().toISOString(),
     };
 
-    // 3. PERSISTENCE IN MONGODB (if configured)
+    // --------------------------------------------------------------------------
+    // 2. SAVE MESSAGE TO MONGODB ATLAS (First Stage of Transaction)
+    // --------------------------------------------------------------------------
     let mongoDocId = null;
     let messagesCollection = null;
 
-    if (process.env.MONGODB_URI && clientPromise) {
-      try {
-        console.log('[MongoDB Driver] Connecting to database cluster...');
-        const client = await clientPromise;
-        const db = client.db('portfolio');
-        messagesCollection = db.collection('messages');
+    try {
+      console.log('[MongoDB Atlas] Connecting to database...');
+      const db = await getDatabase('portfolio');
+      messagesCollection = db.collection('messages');
 
-        const insertResult = await messagesCollection.insertOne({
-          ...cleanData,
-          email_delivery_status: 'pending',
-        });
-        mongoDocId = insertResult.insertedId;
-        console.log('[MongoDB Driver] Message stored with pending delivery status. ID:', mongoDocId);
-      } catch (dbErr) {
-        console.error('[MongoDB Driver Error] Database insert failed:', dbErr.message);
-        // We continue to send email even if DB connection fails, ensuring owner gets the message
-      }
+      // Create new document with required schema
+      const newDocument = {
+        name: cleanData.name,
+        email: cleanData.email,
+        subject: cleanData.subject,
+        message: cleanData.message,
+        createdAt: new Date(),
+        created_at: new Date().toISOString(), // Maintained for backward compatibility
+        emailStatus: 'pending',
+        deliveryError: null,
+        emailMessageId: null,
+        ip: anonymizeIp(ip),
+        userAgent: req.headers.get('user-agent')?.substring(0, 200) || 'unknown',
+      };
+
+      const insertResult = await messagesCollection.insertOne(newDocument);
+      mongoDocId = insertResult.insertedId;
+      console.log('[MongoDB Atlas] Message stored successfully! Document ID:', mongoDocId.toString());
+
+      // Ensure helpful index asynchronously
+      messagesCollection.createIndex({ createdAt: -1 }).catch(() => {});
+    } catch (dbErr) {
+      console.error('[MongoDB Atlas Error] Database insertion failed:', dbErr.message);
+      
+      // Save to local emergency cache
+      saveToLocalFallback({
+        ...cleanData,
+        createdAt: new Date().toISOString(),
+        db_error: dbErr.message,
+      });
+
+      // Strict requirement: If database storage fails, return an error rather than false success
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Database connection failed. Unable to store your message. Please reach out directly to riyaladwa9@gmail.com.',
+        },
+        { status: 500 }
+      );
     }
 
-    // 4. EMAIL DELIVERY DISPATCH
+    // --------------------------------------------------------------------------
+    // 3. ATTEMPT EMAIL NOTIFICATION DISPATCH (Second Stage)
+    // --------------------------------------------------------------------------
     const recipientEmail = process.env.EMAIL_TO || process.env.EMAIL_USER || 'riyaladwa9@gmail.com';
-    const emailSubject = `[Portfolio] ${cleanData.subject} - from ${cleanData.name}`;
+    const emailSubject = `[Portfolio Contact] ${cleanData.subject} - from ${cleanData.name}`;
 
-    const submissionDateIST = new Date(cleanData.created_at).toLocaleString('en-US', {
+    const submissionDateIST = new Date().toLocaleString('en-US', {
       timeZone: 'Asia/Kolkata',
       dateStyle: 'full',
       timeStyle: 'medium',
     });
-    const submissionDateUTC = new Date(cleanData.created_at).toUTCString();
+    const submissionDateUTC = new Date().toUTCString();
 
     const plainTextContent = `New message received from your Portfolio website.
 
 --------------------------------------------------
-Sender Name:    ${cleanData.name}
-Sender Email:   ${cleanData.email}
-Subject:        ${cleanData.subject}
-Submission Time: ${submissionDateIST} (IST) / ${submissionDateUTC} (UTC)
+Sender Name:     ${cleanData.name}
+Sender Email:    ${cleanData.email}
+Subject:         ${cleanData.subject}
+Date & Time:     ${submissionDateIST} (IST) / ${submissionDateUTC} (UTC)
+Database Doc ID: ${mongoDocId.toString()}
 --------------------------------------------------
 
 Message:
 ${cleanData.message}
 
 --------------------------------------------------
-Reply directly to this email to respond to ${cleanData.name} (${cleanData.email}).
+Reply directly to this email to reply to ${cleanData.name} (${cleanData.email}).
 `;
 
     const htmlContent = `
@@ -248,69 +295,79 @@ Reply directly to this email to respond to ${cleanData.name} (${cleanData.email}
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F9F9FB; margin: 0; padding: 24px; color: #121212;">
   <div style="max-width: 620px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
     
-    <div style="background-color: #121212; padding: 24px 32px; color: #FFFFFF;">
-      <span style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #A0A0A0; font-weight: 700; display: block; margin-bottom: 6px;">PORTFOLIO CONTACT FORM</span>
-      <h1 style="font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.5px; color: #FFFFFF;">New Message from ${escapeHtml(cleanData.name)}</h1>
+    <div style="background-color: #121212; padding: 24px 30px; color: #FFFFFF;">
+      <span style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9CA3AF; font-weight: 700; display: block; margin-bottom: 6px;">
+        Portfolio Contact Notification
+      </span>
+      <h1 style="font-size: 22px; font-weight: 800; margin: 0; line-height: 1.2;">
+        New Message from ${escapeHtml(cleanData.name)}
+      </h1>
     </div>
 
-    <div style="padding: 32px;">
+    <div style="padding: 30px;">
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
         <tr>
-          <td style="padding: 8px 0; color: #777777; font-size: 13px; width: 110px; font-weight: 600;">SENDER:</td>
-          <td style="padding: 8px 0; font-size: 14px; font-weight: 700; color: #121212;">${escapeHtml(cleanData.name)}</td>
+          <td style="padding: 8px 0; color: #6B7280; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 110px;">Name</td>
+          <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600;">${escapeHtml(cleanData.name)}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; color: #777777; font-size: 13px; font-weight: 600;">EMAIL:</td>
-          <td style="padding: 8px 0; font-size: 14px;">
-            <a href="mailto:${escapeHtml(cleanData.email)}" style="color: #121212; text-decoration: underline; font-weight: 600;">${escapeHtml(cleanData.email)}</a>
+          <td style="padding: 8px 0; color: #6B7280; font-size: 12px; font-weight: 700; text-transform: uppercase;">Email</td>
+          <td style="padding: 8px 0; color: #111827; font-size: 14px;">
+            <a href="mailto:${escapeHtml(cleanData.email)}" style="color: #2563EB; text-decoration: underline;">
+              ${escapeHtml(cleanData.email)}
+            </a>
           </td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; color: #777777; font-size: 13px; font-weight: 600;">SUBJECT:</td>
-          <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #121212;">${escapeHtml(cleanData.subject)}</td>
+          <td style="padding: 8px 0; color: #6B7280; font-size: 12px; font-weight: 700; text-transform: uppercase;">Subject</td>
+          <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600;">${escapeHtml(cleanData.subject)}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; color: #777777; font-size: 13px; font-weight: 600;">DATE & TIME:</td>
-          <td style="padding: 8px 0; font-size: 13px; color: #555555;">${submissionDateIST} (IST)</td>
+          <td style="padding: 8px 0; color: #6B7280; font-size: 12px; font-weight: 700; text-transform: uppercase;">Submitted</td>
+          <td style="padding: 8px 0; color: #4B5563; font-size: 13px;">${submissionDateIST} (IST)</td>
         </tr>
       </table>
 
-      <div style="margin-top: 16px;">
-        <span style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #777777; font-weight: 700; display: block; margin-bottom: 8px;">MESSAGE:</span>
-        <div style="background-color: #F4F2EB; border-left: 4px solid #121212; border-radius: 8px; padding: 18px; font-size: 14px; line-height: 1.7; color: #121212; white-space: pre-wrap; font-family: inherit;">${escapeHtml(cleanData.message)}</div>
+      <div style="margin: 20px 0;">
+        <span style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #6B7280; font-weight: 700; display: block; margin-bottom: 8px;">
+          Message
+        </span>
+        <div style="background-color: #F4F2EB; border-left: 4px solid #121212; padding: 18px; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #1F2937; white-space: pre-wrap;">
+${escapeHtml(cleanData.message)}
+        </div>
       </div>
 
-      <div style="margin-top: 32px; text-align: center;">
-        <a href="mailto:${escapeHtml(cleanData.email)}?subject=Re:%20${encodeURIComponent(cleanData.subject)}" style="display: inline-block; background-color: #121212; color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-decoration: none; padding: 12px 24px; border-radius: 9999px;">
-          REPLY TO ${escapeHtml(cleanData.name.toUpperCase())} &rarr;
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #E5E7EB; text-align: center;">
+        <a href="mailto:${escapeHtml(cleanData.email)}?subject=${encodeURIComponent('Re: ' + cleanData.subject)}" 
+           style="display: inline-block; background-color: #121212; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px;">
+          Reply to ${escapeHtml(cleanData.name)} Directly
         </a>
       </div>
     </div>
 
-    <div style="background-color: #F9F9FB; border-top: 1px solid #E5E7EB; padding: 16px 32px; font-size: 11px; color: #888888; text-align: center;">
-      This email was delivered securely from your personal portfolio website (riyaladwa.dev).
+    <div style="background-color: #F9FAFB; padding: 16px 30px; border-top: 1px solid #E5E7EB; font-size: 11px; color: #9CA3AF; text-align: center;">
+      Recorded in MongoDB Atlas Collection <code>portfolio.messages</code> &bull; ID: ${mongoDocId.toString()}
     </div>
-
   </div>
 </body>
 </html>
 `;
 
     let emailDelivered = false;
-    let deliveryMessageId = null;
+    let emailMessageId = null;
     let emailDeliveryError = null;
 
-    // Check Option A: Resend API (Preferred for cloud edge/serverless without SMTP timeouts)
+    // Option A: Resend API (if configured)
     if (process.env.RESEND_API_KEY) {
       try {
-        console.log('[Email Dispatcher] Attempting delivery via Resend...');
+        console.log('[Email Dispatcher] Attempting delivery via Resend HTTP API...');
         const resend = new Resend(process.env.RESEND_API_KEY);
-        const fromAddress = process.env.RESEND_FROM || 'Portfolio Contact <onboarding@resend.dev>';
+        const fromAddress = process.env.RESEND_FROM || process.env.EMAIL_FROM || 'Portfolio <onboarding@resend.dev>';
 
         const resendResponse = await resend.emails.send({
           from: fromAddress,
           to: recipientEmail,
-          replyTo: cleanData.email,
+          reply_to: cleanData.email,
           subject: emailSubject,
           text: plainTextContent,
           html: htmlContent,
@@ -321,19 +378,18 @@ Reply directly to this email to respond to ${cleanData.name} (${cleanData.email}
         }
 
         emailDelivered = true;
-        deliveryMessageId = resendResponse.data?.id || 'resend-ok';
-        console.log('[Email Dispatcher] Sent successfully via Resend. ID:', deliveryMessageId);
+        emailMessageId = resendResponse.data?.id || 'resend-sent';
+        console.log('[Email Dispatcher] Sent via Resend successfully! Message ID:', emailMessageId);
       } catch (resendErr) {
-        console.error('[Email Dispatcher Error] Resend dispatch failed:', resendErr.message);
-        emailDeliveryError = resendErr.message;
+        console.error('[Email Dispatcher Error] Resend failed:', resendErr.message);
+        emailDeliveryError = `Resend error: ${resendErr.message}`;
       }
     }
 
-    // Check Option B: Nodemailer SMTP (e.g. Gmail App Password)
-    // Runs if Resend is not configured or if Resend failed and SMTP credentials exist
+    // Option B: Nodemailer with Gmail SMTP (if Resend wasn't used or failed)
     if (!emailDelivered && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       try {
-        console.log('[Email Dispatcher] Attempting delivery via Nodemailer SMTP...');
+        console.log('[Email Dispatcher] Attempting delivery via Nodemailer Gmail SMTP...');
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
@@ -345,10 +401,12 @@ Reply directly to this email to respond to ${cleanData.name} (${cleanData.email}
           socketTimeout: 15000,
         });
 
+        const senderHeader = `"Portfolio Contact" <${process.env.EMAIL_USER}>`;
+
         const mailOptions = {
-          from: `"Portfolio Contact Form" <${process.env.EMAIL_USER}>`,
+          from: senderHeader,
           to: recipientEmail,
-          replyTo: cleanData.email,
+          replyTo: `${cleanData.name} <${cleanData.email}>`,
           subject: emailSubject,
           text: plainTextContent,
           html: htmlContent,
@@ -356,87 +414,56 @@ Reply directly to this email to respond to ${cleanData.name} (${cleanData.email}
 
         const info = await transporter.sendMail(mailOptions);
         emailDelivered = true;
-        deliveryMessageId = info.messageId;
-        console.log('[Email Dispatcher] Sent successfully via Nodemailer. ID:', info.messageId);
+        emailMessageId = info.messageId;
+        console.log('[Email Dispatcher] Sent via Nodemailer successfully! Message ID:', info.messageId);
       } catch (smtpErr) {
-        console.error('[Email Dispatcher Error] Nodemailer SMTP dispatch failed:', smtpErr.message);
-        emailDeliveryError = smtpErr.message;
+        console.error('[Email Dispatcher Error] Nodemailer SMTP failed:', smtpErr.message);
+        emailDeliveryError = `SMTP error: ${smtpErr.message}`;
       }
     }
 
-    // 5. UPDATE DATABASE WITH ACCURATE DELIVERY STATUS
+    // --------------------------------------------------------------------------
+    // 4. UPDATE MONGODB DOCUMENT WITH EMAIL DELIVERY STATUS
+    // --------------------------------------------------------------------------
     if (mongoDocId && messagesCollection) {
       try {
-        if (emailDelivered) {
-          await messagesCollection.updateOne(
-            { _id: mongoDocId },
-            {
-              $set: {
-                email_delivery_status: 'sent',
-                email_message_id: deliveryMessageId,
-                delivered_at: new Date().toISOString(),
-              },
-            }
-          );
-        } else {
-          await messagesCollection.updateOne(
-            { _id: mongoDocId },
-            {
-              $set: {
-                email_delivery_status: 'failed',
-                email_error: emailDeliveryError || 'No email provider succeeded',
-                failed_at: new Date().toISOString(),
-              },
-            }
-          );
-        }
+        await messagesCollection.updateOne(
+          { _id: mongoDocId },
+          {
+            $set: {
+              emailStatus: emailDelivered ? 'sent' : 'failed',
+              deliveryError: emailDeliveryError || null,
+              emailMessageId: emailMessageId || null,
+              updatedAt: new Date(),
+            },
+          }
+        );
+        console.log(`[MongoDB Atlas] Document updated with emailStatus: ${emailDelivered ? 'sent' : 'failed'}`);
       } catch (updateErr) {
-        console.error('[MongoDB Driver Error] Failed to update delivery status:', updateErr.message);
+        console.error('[MongoDB Atlas Error] Failed to update document status:', updateErr.message);
       }
     }
 
-    // 6. ALWAYS SAVE TO LOCAL FALLBACK CACHE FOR LOGGING
-    saveToLocalFallback({
-      id: Date.now().toString(),
-      ...cleanData,
-      email_delivery_status: emailDelivered ? 'sent' : 'failed',
-      email_message_id: deliveryMessageId,
-      email_error: emailDeliveryError,
-    });
-
-    // 7. RESPOND TO CLIENT GRACEFULLY
-    // If message was saved to MongoDB Atlas, count as success!
-    if (mongoDocId) {
-      return NextResponse.json({
-        success: true,
-        savedToDatabase: true,
-        emailDelivered: Boolean(emailDelivered),
-        message: 'Message sent successfully! Thank you, Riya will get back to you shortly.',
-      });
-    }
-
-    // If email delivered successfully via Resend or Nodemailer
+    // --------------------------------------------------------------------------
+    // 5. RETURN STRUCTURED RESPONSE TO CLIENT
+    // --------------------------------------------------------------------------
     if (emailDelivered) {
       return NextResponse.json({
         success: true,
+        savedToDatabase: true,
         emailDelivered: true,
-        message: 'Message sent successfully! Thank you, Riya will get back to you shortly.',
+        messageId: mongoDocId.toString(),
+        message: 'Thank you! Your message has been saved and delivered to Riya. She will get back to you shortly.',
       });
     }
 
-    // If neither DB nor email credentials are active on host (e.g. initial deployment without env vars),
-    // provide an instant direct email client link pre-filled with the user's message.
-    const directMailto = `mailto:riyaladwa9@gmail.com?subject=${encodeURIComponent(
-      emailSubject
-    )}&body=${encodeURIComponent(
-      `Hi Riya,\n\n${cleanData.message}\n\n---\nName: ${cleanData.name}\nEmail: ${cleanData.email}\nDate: ${submissionDateIST}`
-    )}`;
-
+    // If message is saved in MongoDB Atlas, but email notification failed or wasn't configured
     return NextResponse.json({
       success: true,
-      fallbackRequired: true,
-      mailto: directMailto,
-      message: 'Your message has been captured! To ensure immediate delivery, you can also send it directly via your mail client below.',
+      savedToDatabase: true,
+      emailDelivered: false,
+      messageId: mongoDocId.toString(),
+      message: 'Your message was successfully received and stored in our database! Note: Email notification dispatch may be delayed.',
     });
   } catch (error) {
     console.error('[API Error] Unhandled exception in contact submission:', error.message);

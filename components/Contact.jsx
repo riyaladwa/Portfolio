@@ -117,13 +117,12 @@ export default function Contact() {
       if (response.ok && data.success) {
         setStatus({
           type: 'success',
-          message: data.message || 'Message sent! Thank you, Riya will get back to you shortly.',
-          mailto: data.mailto || null,
+          message: data.message || 'Thank you! Your message has been saved and received.',
+          mailto: null,
         });
-        if (!data.fallbackRequired) {
-          setForm({ name: '', email: '', subject: '', message: '' });
-          setHoneypot('');
-        }
+        // Reset form only after successful database storage
+        setForm({ name: '', email: '', subject: '', message: '' });
+        setHoneypot('');
       } else {
         const directMailto = `mailto:riyaladwa9@gmail.com?subject=${encodeURIComponent(
           form.subject || 'Portfolio Inquiry'
@@ -132,7 +131,7 @@ export default function Contact() {
         )}`;
         setStatus({
           type: 'error',
-          message: data.error || 'Server email delivery is currently unconfigured. Click below to send directly via your mail client:',
+          message: data.error || 'Failed to save message. You can send it directly to riyaladwa9@gmail.com below:',
           mailto: directMailto,
         });
       }
