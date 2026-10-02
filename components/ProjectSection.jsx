@@ -44,9 +44,29 @@ const PROJECTS = [
     solution: 'Built an interactive Google Maps geospatial representation of municipal coordinates linked with AI forecasting, simulating gridlocks and raising real-time alerts to Supabase webhooks.'
   },
   {
+    title: 'SatQuery AI',
+    category: 'Geospatial AI',
+    number: '03',
+    subtitle: 'Vision-Language Assistant for Remote Sensing Analysis',
+    description: 'SatQuery AI is an interactive vision-language assistant for multimodal remote sensing image analysis that enables users to analyze satellite imagery using natural-language queries. It aims to simplify geospatial analysis by providing AI-assisted insights into satellite images for applications such as disaster management, agriculture, urban monitoring, and environmental analysis.',
+    features: [
+      'Natural-language querying of high-resolution satellite imagery',
+      'Multimodal vision-language processing via Google Gemini API',
+      'FastAPI backend orchestrating satellite image analysis pipelines',
+      'Actionable geospatial insights for disaster relief, agriculture, and urban monitoring'
+    ],
+    tags: ['React.js', 'FastAPI', 'Python', 'Supabase', 'Gemini API', 'Geospatial Tools'],
+    githubUrl: 'https://github.com/riyaladwa/Satquery.git',
+    liveUrl: 'https://satquery-blond.vercel.app/',
+    featured: false,
+    layoutType: 'half',
+    problem: 'Traditional satellite imagery analysis requires specialized remote sensing software, complex manual interpretations, and heavy domain expertise, slowing down time-sensitive interventions.',
+    solution: 'Engineered an interactive vision-language assistant combining React.js and a Python/FastAPI backend with Google Gemini API and Supabase, empowering users to extract actionable insights from satellite imagery via natural-language queries.'
+  },
+  {
     title: 'TaskPro Manager',
     category: 'Productivity Tool',
-    number: '03',
+    number: '04',
     subtitle: 'Full-Stack Productivity Application',
     description: 'Built a full-stack task manager with complete CRUD operations and real-time UI sync, backed by a Node.js/Express REST API and a persistent MongoDB/Supabase database.',
     features: [
@@ -58,7 +78,7 @@ const PROJECTS = [
     tags: ['React.js', 'JavaScript', 'Node.js', 'Express.js', 'MongoDB', 'Supabase', 'Gemini API', 'CSS'],
     githubUrl: 'https://github.com/riyaladwa/TaskPro-Manager.git',
     featured: false,
-    layoutType: 'horizontal',
+    layoutType: 'half',
     problem: 'Developers and students need robust task synchronization across multiple sessions, without complex interfaces or lagging reactivity.',
     solution: 'Implemented full CRUD operations and secure JWT route middleware, allowing real-time board updates connected to a MongoDB backend.'
   }

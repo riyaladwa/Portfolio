@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Github, Globe } from 'lucide-react';
 
 // Mock Visual Component for Guardian AI
 function GuardianVisual() {
@@ -155,6 +155,67 @@ function TaskProVisual() {
   );
 }
 
+// Visual Component for SatQuery AI (Multimodal Remote Sensing & Satellite Vision)
+function SatQueryVisual() {
+  return (
+    <div className="relative w-full h-full bg-[#080e21] p-4 flex flex-col justify-between overflow-hidden group">
+      {/* Background Radial Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(14,165,233,0.18)_0%,transparent_70%)] pointer-events-none" />
+
+      {/* Coordinate Grid Texture */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.05)_1px,transparent_1px)] bg-[size:18px_18px] pointer-events-none" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-white/10 pb-2 z-10">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[9px] text-cyan-400 tracking-widest font-display font-black uppercase">
+            REMOTE_SENSING_AI
+          </span>
+        </div>
+        <span className="text-[8px] font-mono text-white/50 tracking-wider">
+          ORBIT: 686 KM
+        </span>
+      </div>
+
+      {/* Center Satellite Scanner Visual */}
+      <div className="relative flex-grow flex items-center justify-center my-2 z-10">
+        {/* Outer Circular Ring */}
+        <div className="relative w-24 h-24 rounded-full border border-cyan-500/25 flex items-center justify-center">
+          {/* Dashed Rotating Ring */}
+          <div className="absolute inset-1 rounded-full border border-dashed border-cyan-400/40 animate-spin [animation-duration:20s]" />
+          
+          {/* Crosshair Axes */}
+          <div className="absolute w-full h-[1px] bg-cyan-500/20" />
+          <div className="absolute h-full w-[1px] bg-cyan-500/20" />
+
+          {/* Center Target Box */}
+          <div className="relative w-10 h-10 rounded-lg border border-cyan-400/60 bg-cyan-500/10 flex flex-col items-center justify-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-ping" />
+            <span className="text-[6.5px] font-mono font-bold text-cyan-200 mt-0.5">VISION_AI</span>
+          </div>
+
+          {/* Radar Sweep Effect */}
+          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(56,189,248,0.22)_360deg)] animate-spin [animation-duration:4s] pointer-events-none" />
+        </div>
+
+        {/* Floating Natural Language Prompt Pill */}
+        <div className="absolute top-0 left-1 bg-[#0b1636]/90 border border-cyan-500/30 px-2 py-0.5 rounded-full shadow-lg">
+          <span className="text-[7px] font-mono text-cyan-200 flex items-center gap-1">
+            <span className="text-emerald-400">&gt;</span> &ldquo;Analyze flood anomalies&rdquo;
+          </span>
+        </div>
+
+        {/* Telemetry pill */}
+        <div className="absolute bottom-0 right-1 bg-[#0b1636]/90 border border-white/10 px-2 py-0.5 rounded text-[7px] font-mono flex flex-col gap-0.5 text-right">
+          <span className="text-emerald-400 font-bold">MULTISPECTRAL READY</span>
+          <span className="text-white/40">LAT 14.46°N | LON 75.92°E</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectCard({ project, onClick }) {
   const getVisual = (title) => {
     switch (title.toLowerCase()) {
@@ -162,6 +223,8 @@ export default function ProjectCard({ project, onClick }) {
         return <GuardianVisual />;
       case 'civic twin ai':
         return <CivicTwinVisual />;
+      case 'satquery ai':
+        return <SatQueryVisual />;
       case 'taskpro manager':
         return <TaskProVisual />;
       default:
@@ -189,6 +252,8 @@ export default function ProjectCard({ project, onClick }) {
           ? 'col-span-1 md:col-span-12 lg:col-span-8 min-h-[380px] md:min-h-[420px]'
           : isVertical
           ? 'col-span-1 md:col-span-6 lg:col-span-4 min-h-[460px] md:min-h-[500px]'
+          : project.layoutType === 'half'
+          ? 'col-span-1 md:col-span-6 lg:col-span-6 min-h-[380px] md:min-h-[420px]'
           : 'col-span-1 md:col-span-6 lg:col-span-12 min-h-[380px] md:min-h-[400px]'
       }`}
       data-cursor="view"
@@ -225,7 +290,7 @@ export default function ProjectCard({ project, onClick }) {
         </div>
 
         {/* Tech tags and action footer */}
-        <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-1.5">
             {project.tags.slice(0, 3).map((tag) => (
               <span 
@@ -235,12 +300,46 @@ export default function ProjectCard({ project, onClick }) {
                 {tag}
               </span>
             ))}
+            {project.tags.length > 3 && (
+              <span className="text-[9px] font-mono text-secondary/60 self-center">
+                +{project.tags.length - 3}
+              </span>
+            )}
           </div>
 
-          <span className="flex items-center gap-1 text-[10px] font-display font-black tracking-widest text-primary group-hover:underline">
-            VIEW DETAILS
-            <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
-          </span>
+          <div className="flex items-center gap-2">
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-[10px] font-display font-black tracking-wider text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100/80 border border-blue-200/60 px-2.5 py-1 rounded-full transition-colors"
+                title="Launch Live Demo"
+              >
+                <Globe size={11} />
+                <span>DEMO</span>
+                <ArrowUpRight size={10} />
+              </a>
+            )}
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-[10px] font-display font-black tracking-wider text-secondary hover:text-primary bg-background hover:bg-backgroundAlt border border-border px-2.5 py-1 rounded-full transition-colors"
+                title="View Code on GitHub"
+              >
+                <Github size={11} />
+                <span>CODE</span>
+              </a>
+            )}
+            <span className="flex items-center gap-1 text-[10px] font-display font-black tracking-widest text-primary group-hover:underline">
+              DETAILS
+              <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+            </span>
+          </div>
         </div>
       </div>
     </motion.article>

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Github, ArrowUpRight } from 'lucide-react';
+import { X, Github, ArrowUpRight, Globe, ExternalLink } from 'lucide-react';
 
 export default function ProjectModal({ project, onClose }) {
   // Lock scroll and listen to Esc key
@@ -66,7 +66,7 @@ export default function ProjectModal({ project, onClose }) {
               </div>
 
               {/* Technical Description Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-y border-border/60">
+              <div className={`grid grid-cols-1 sm:grid-cols-2 ${project.liveUrl ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6 py-6 border-y border-border/60`}>
                 <div>
                   <h4 className="text-[10px] font-display font-black tracking-widest text-secondary/50 uppercase mb-2">
                     ROLE & FOCUS
@@ -83,6 +83,23 @@ export default function ProjectModal({ project, onClose }) {
                     Hackathon Prototype / Core Project
                   </p>
                 </div>
+                {project.liveUrl && (
+                  <div>
+                    <h4 className="text-[10px] font-display font-black tracking-widest text-secondary/50 uppercase mb-2">
+                      LIVE DEPLOYMENT
+                    </h4>
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-blue-600 font-bold hover:underline"
+                    >
+                      <Globe size={14} />
+                      Launch Site
+                      <ArrowUpRight size={12} />
+                    </a>
+                  </div>
+                )}
                 {project.githubUrl && (
                   <div>
                     <h4 className="text-[10px] font-display font-black tracking-widest text-secondary/50 uppercase mb-2">
@@ -171,12 +188,28 @@ export default function ProjectModal({ project, onClose }) {
 
               {/* Action Buttons */}
               <div className="mt-8 pt-8 border-t border-border flex flex-col sm:flex-row items-center gap-4">
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-8 py-4 bg-primary text-white text-xs font-display font-black tracking-widest rounded-full hover:bg-secondary text-center transition-colors duration-300 flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <Globe size={16} />
+                    LAUNCH LIVE DEMO
+                    <ExternalLink size={14} />
+                  </a>
+                )}
                 {project.githubUrl && (
                   <a
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full sm:w-auto px-8 py-4 bg-primary text-white text-xs font-display font-black tracking-widest rounded-full hover:bg-secondary text-center transition-colors duration-300 flex items-center justify-center gap-2"
+                    className={`w-full sm:w-auto px-8 py-4 ${
+                      project.liveUrl
+                        ? 'border border-border text-primary hover:bg-background'
+                        : 'bg-primary text-white hover:bg-secondary'
+                    } text-xs font-display font-black tracking-widest rounded-full text-center transition-colors duration-300 flex items-center justify-center gap-2`}
                   >
                     <Github size={16} />
                     VIEW GITHUB REPOSITORY
@@ -184,7 +217,7 @@ export default function ProjectModal({ project, onClose }) {
                 )}
                 <button
                   onClick={onClose}
-                  className="w-full sm:w-auto px-8 py-4 border border-border text-primary text-xs font-display font-black tracking-widest rounded-full hover:bg-background text-center transition-colors duration-300"
+                  className="w-full sm:w-auto px-8 py-4 border border-border text-secondary text-xs font-display font-black tracking-widest rounded-full hover:bg-background text-center transition-colors duration-300 sm:ml-auto"
                 >
                   CLOSE PREVIEW
                 </button>
